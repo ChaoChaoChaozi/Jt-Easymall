@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jt.easymall.mapper.OrderMapper">
+	<insert id="saveOrder" parameterType="Order">
+	<!--增加主表数据-->
+	insert into t_order (
+	order_id,
+	order_money,
+	order_receiverinfo,
+	order_paystate,
+	user_id,
+	order_time
+	) values(#{orderId},#{orderMoney},#{orderReceiverinfo},
+	#{orderPaystate},#{userId},#{orderTime});
+	<!--新增从表数据-->
+	insert into t_order_item (
+	order_id,
+	product_id,
+	product_image,
+	product_name,
+	product_price,
+	num) values 
+	<foreach collection="orderItems" item="item" separator=",">
+	(#{orderId},#{item.productId},#{item.productImage},
+	#{item.productName},#{item.productPrice},#{item.num})
+	</foreach>;
+	</insert>
+	
+	<resultMap type="Order" id="orderRM">
+	<!-- 查询的主要关联字段 order_id -->
+	<id property="orderId" column="order_id"/>
+	<!-- 设置对多关系数据的封装 --><!-- select属性的值,指向一个select标签 -->
+	<collection property="orderItems" 
+	javaType="ArrayList" ofType="OrderItem" column="order_id" 
+	select="queryOrderItems"></collection>
+	</resultMap>
+	
+	<select id="queryMyorder" parameterType="string" 
+	resultMap="orderRM">
+	<!-- 单表查询,不使用关联 ,查主表-->
+	select * from t_order where user_id=#{userId} order by order_time desc
+	</select>
+	<select id="queryOrderItems" parameterType="string" 
+	resultType="OrderItem">
+	select * from t_order_item where order_id=#{orderId}
+	</select>
+	
+	<delete id="deleteOrder" parameterType="string">
+	DELETE a,b FROM t_order a,t_order_item b WHERE a.order_id=
+	b.order_id AND a.order_id=#{orderId}
+	</delete>
+	
+	
+	<delete id="deleteOTOrders" parameterType="date">
+	<!-- 根据查询超时订单条件,同时删除item和order数据 -->
+	delete a,b from t_order a,t_order_item b 
+	where a.order_id=b.order_id and a.order_paystate=0 
+	and a.order_time &lt;=#{date}
+	</delete>
+</mapper> 
+
+
+
+
+
+
+
+
+
+
+
+

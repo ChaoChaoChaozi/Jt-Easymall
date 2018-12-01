@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jt.easymall.mapper.CartMapper">
+	<select id="queryMycart" parameterType="string" resultType="Cart">
+	select * from t_cart where user_id=#{userId}
+	</select>
+	<select id="findOne" parameterType="Cart" resultType="Cart">
+	select * from t_cart where 
+	user_id=#{userId} and product_id=#{productId}
+	</select>
+	<insert id="addCart" parameterType="Cart">
+	insert into t_cart (
+	id,
+	user_id,
+	product_id,
+	product_name,
+	product_price,
+	product_image,
+	num
+	) values (
+	#{id},
+	#{userId},
+	#{productId},
+	#{productName},
+	#{productPrice},
+	#{productImage},
+	#{num}
+	)
+	</insert>
+	<update id="updateCartNum" parameterType="Cart">
+	update t_cart set num=#{num} where 
+	user_id=#{userId} and product_id=#{productId}
+	</update>
+</mapper> 
+
+
+
+
+
+
+
+
+
+
+
+
